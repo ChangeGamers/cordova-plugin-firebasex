@@ -10,8 +10,12 @@
 
 // Authentication
 - (void)verifyPhoneNumber:(CDVInvokedUrlCommand*)command;
+- (void)setLanguageCode:(CDVInvokedUrlCommand*)command;
 - (void)createUserWithEmailAndPassword:(CDVInvokedUrlCommand*)command;
 - (void)signInUserWithEmailAndPassword:(CDVInvokedUrlCommand*)command;
+- (void)authenticateUserWithEmailAndPassword:(CDVInvokedUrlCommand*)command;
+- (void)signInUserWithCustomToken:(CDVInvokedUrlCommand*)command;
+- (void)signInUserAnonymously:(CDVInvokedUrlCommand*)command;
 - (void)authenticateUserWithGoogle:(CDVInvokedUrlCommand*)command;
 - (void)authenticateUserWithApple:(CDVInvokedUrlCommand*)command;
 - (void)signInWithCredential:(CDVInvokedUrlCommand*)command;
@@ -20,6 +24,7 @@
 - (void)isUserSignedIn:(CDVInvokedUrlCommand*)command;
 - (void)signOutUser:(CDVInvokedUrlCommand*)command;
 - (void)getCurrentUser:(CDVInvokedUrlCommand*)command;
+- (void)reloadCurrentUser:(CDVInvokedUrlCommand*)command;
 - (void)updateUserProfile:(CDVInvokedUrlCommand*)command;
 - (void)updateUserEmail:(CDVInvokedUrlCommand*)command;
 - (void)sendUserEmailVerification:(CDVInvokedUrlCommand*)command;
@@ -39,9 +44,11 @@
 - (void)subscribe:(CDVInvokedUrlCommand*)command;
 - (void)unsubscribe:(CDVInvokedUrlCommand*)command;
 - (void)unregister:(CDVInvokedUrlCommand*)command;
+- (void)onOpenSettings:(CDVInvokedUrlCommand*)command;
 - (void)onMessageReceived:(CDVInvokedUrlCommand*)command;
 - (void)onTokenRefresh:(CDVInvokedUrlCommand*)command;
 - (void)onApnsTokenReceived:(CDVInvokedUrlCommand *)command;
+- (void)sendOpenNotificationSettings;
 - (void)sendNotification:(NSDictionary*)userInfo;
 - (void)sendToken:(NSString*)token;
 - (void)sendApnsToken:(NSString*)token;
@@ -58,7 +65,8 @@
 // Crashlytics
 - (void)setCrashlyticsCollectionEnabled:(CDVInvokedUrlCommand*)command;
 - (void)isCrashlyticsCollectionEnabled:(CDVInvokedUrlCommand*)command;
-- (void)isCrashlyticsCollectionCurrentlyEnabled:(CDVInvokedUrlCommand*)command;
+- (void)didCrashOnPreviousExecution:(CDVInvokedUrlCommand *)command;
+- (void)setCrashlyticsCustomKey:(CDVInvokedUrlCommand *)command;
 - (void)logError:(CDVInvokedUrlCommand*)command;
 - (void)logMessage:(CDVInvokedUrlCommand*)command;
 - (void)sendCrash:(CDVInvokedUrlCommand*)command;
@@ -68,6 +76,13 @@
 - (void)fetch:(CDVInvokedUrlCommand*)command;
 - (void)activateFetched:(CDVInvokedUrlCommand*)command;
 - (void)getValue:(CDVInvokedUrlCommand*)command;
+- (void)getInfo:(CDVInvokedUrlCommand*)command;
+- (void)fetchAndActivate:(CDVInvokedUrlCommand*)command;
+- (void)getAll:(CDVInvokedUrlCommand*)command;
+- (void)resetRemoteConfig:(CDVInvokedUrlCommand*)command;
+- (void)setConfigSettings:(CDVInvokedUrlCommand*)command;
+- (void)setDefaults:(CDVInvokedUrlCommand*)command;
+
 
 // Performance
 - (void)setPerformanceCollectionEnabled:(CDVInvokedUrlCommand*)command;
@@ -81,9 +96,20 @@
 - (void)setDocumentInFirestoreCollection:(CDVInvokedUrlCommand*)command;
 - (void)updateDocumentInFirestoreCollection:(CDVInvokedUrlCommand*)command;
 - (void)deleteDocumentFromFirestoreCollection:(CDVInvokedUrlCommand*)command;
+- (void)documentExistsInFirestoreCollection:(CDVInvokedUrlCommand*)command;
 - (void)fetchDocumentInFirestoreCollection:(CDVInvokedUrlCommand*)command;
 - (void)fetchFirestoreCollection:(CDVInvokedUrlCommand*)command;
+- (void)listenToDocumentInFirestoreCollection:(CDVInvokedUrlCommand*)command;
+- (void)listenToFirestoreCollection:(CDVInvokedUrlCommand*)command;
+- (void)removeFirestoreListener:(CDVInvokedUrlCommand*)command;
 
+// Functions
+- (void)functionsHttpsCallable:(CDVInvokedUrlCommand*)command;
+
+// Installations
+- (void) getInstallationId:(CDVInvokedUrlCommand*)command;
+- (void) getInstallationToken:(CDVInvokedUrlCommand*)command;
+- (void) deleteInstallationId:(CDVInvokedUrlCommand*)command;
 
 // Internals
 + (FirebasePlugin *) firebasePlugin;
@@ -95,7 +121,7 @@
 - (void) _logInfo: (NSString*)msg;
 - (void) _logMessage: (NSString*)msg;
 - (BOOL) _shouldEnableCrashlytics;
-- (int) saveAuthCredential: (FIRAuthCredential *) authCredential;
+- (NSNumber*) saveAuthCredential: (FIRAuthCredential *) authCredential;
 - (void)executeGlobalJavascript: (NSString*)jsString;
 
 - (void)createChannel:(CDVInvokedUrlCommand *)command;
@@ -104,6 +130,7 @@
 - (void)listChannels:(CDVInvokedUrlCommand *)command;
 
 @property (nonatomic, copy) NSString *notificationCallbackId;
+@property (nonatomic, copy) NSString *openSettingsCallbackId;
 @property (nonatomic, copy) NSString *tokenRefreshCallbackId;
 @property (nonatomic, copy) NSString *apnsTokenRefreshCallbackId;
 @property (nonatomic, copy) NSString *googleSignInCallbackId;
@@ -111,5 +138,6 @@
 
 @property (nonatomic, retain) NSMutableArray *notificationStack;
 @property (nonatomic, readwrite) NSMutableDictionary* traces;
+@property(nonatomic, nullable) id<NSObject> installationIDObserver;
 
 @end
